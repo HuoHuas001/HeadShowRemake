@@ -1,0 +1,8 @@
+{   
+  "updateTick":60,
+  "scoreBoard": {
+    "score": "money",
+    "score1": "money1"
+  },
+  "showTitle":"%player_realname%\n§c❤§b%player_max_health%§e/§a%player_health% §b%player_max_hunger%§e/§a%player_hunger%\n§f%player_device% §c%player_ping%ms"
+}
