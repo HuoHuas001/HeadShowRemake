@@ -1,6 +1,8 @@
 name: Build
 
 on:
+  schedule:
+  - cron: "5 0 * * 0"
   workflow_dispatch:
   push:
     branches:
@@ -28,7 +30,8 @@ jobs:
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
           mkdir -p ${{ env.SDK_DIR }}/Tools/Server
-          ServerLink=https://minecraft.azureedge.net/bin-win/bedrock-server-${{ env.BDS_VERSION }}.zip
+          curl -L -o ${{ env.SDK_DIR }}/Tools/LINK.txt "https://raw.githubusercontent.com/LiteLDev/LiteLoaderBDS/develop/scripts/LINK.txt"
+          ServerLink=$(cat '${{ env.SDK_DIR }}/Tools/LINK.txt')
           curl -L -o ${{ env.SDK_DIR }}/Tools/Server/server.zip "$ServerLink"
           unzip ${{ env.SDK_DIR }}/Tools/Server/server.zip -d ${{ env.SDK_DIR }}/Tools/Server/ > /dev/null
         shell: bash
