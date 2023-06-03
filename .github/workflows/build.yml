@@ -14,6 +14,8 @@ env:
   BUILD_CONFIGURATION: Release
   Platform: X64
   SDK_DIR: ./SDK
+  RepoName: 'HuoHuas001/HeadShowRemake'
+  ResourceId: '3405'
   BDS_VERSION: 1.19.83.01
 
 jobs:
@@ -85,21 +87,42 @@ jobs:
         shell: bash
 
       - name: Pack Release
-        working-directory: ${{env.GITHUB_WORKSPACE}}
+        working-directory: ${{ env.GITHUB_WORKSPACE }}
         if: startsWith(github.ref, 'refs/tags/')
         run: 
-          Compress-Archive -Path output\${{env.PLUGIN_NAME}}\ plugins.zip
+          Compress-Archive -Path output\${{ env.PLUGIN_NAME }}\ plugins.zip
           Compress-Archive -Path output\PDB\ PDB.zip
 
       - name: Upload PLUGIN
         uses: actions/upload-artifact@v2
         with:
           name: plugins
-          path: ${{ github.workspace }}\output\${{env.PLUGIN_NAME}}
+          path: ${{ github.workspace }}\output\${{ env.PLUGIN_NAME }}
 
       - name: Upload PDB
         uses: actions/upload-artifact@v2
         with:
           name: PDB
           path: ${{ github.workspace }}\output\PDB
+
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        if: github.repository == ${{env.RepoName}} && startsWith(github.ref, 'refs/tags/')
+        with:
+          timeZone: 8
+          format: 'YYYY/MM/DD-HH:mm:ss'
+
+      - name: Update MineBBS infomation
+        uses: fjogeleit/http-request-action@v1
+        if: success() && github.event_name == 'push' && github.repository == ${{env.RepoName}} && startsWith(github.ref, 'refs/tags/')
+        with:
+          url: 'https://api.minebbs.com/api/openapi/v1/resources/${{ env.ResourceId }}/update'
+          method: 'POST'
+          customHeaders: '{"Authorization": "Bearer ${{ secrets.MBKey }}"}'
+          contentType: 'application/json'
+          data: '{"title": "Update For ${{ env.BDS_VERSION }}", "description": "RT", "new_version": "${{ steps.time.outputs.time }}", "file_url": "https://github.com/HuoHuas001/HeadShowRemake/releases/latest"}'
+          escapeData: 'true'
+          preventFailureOnNoResponse: 'true'
+          ignoreStatusCodes: '400,404,401,403,500,502,503,504'
 
