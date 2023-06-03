@@ -7,7 +7,6 @@
 #include <llapi/ServerAPI.h>
 
 #include "version.h"
-#pragma comment(lib, "../libs/LLMoney.lib")
 
 void PluginInit();
 

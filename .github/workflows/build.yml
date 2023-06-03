@@ -2,6 +2,9 @@ name: Build
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 env:
   PLUGIN_NAME: HeadShow
@@ -69,7 +72,9 @@ jobs:
         run: |
           mkdir output/
           mkdir output/${{env.PLUGIN_NAME}}/
+          mkdir output/${{env.PLUGIN_NAME}}/HeadShow/
           cp -f Release/*.dll output/${{env.PLUGIN_NAME}}/
+          cp -f ./HeadShow/config.json output/${{env.PLUGIN_NAME}}/HeadShow/
           mkdir output/PDB/
           cp -f Release/*.pdb output/PDB/
           # mkdir output/${{env.PLUGIN_NAME}}/${{env.PLUGIN_NAME}}/
@@ -80,19 +85,18 @@ jobs:
         working-directory: ${{env.GITHUB_WORKSPACE}}
         if: startsWith(github.ref, 'refs/tags/')
         run: 
-          cp -f HeadShow output\${{env.PLUGIN_NAME}}\
           Compress-Archive -Path output\${{env.PLUGIN_NAME}}\ plugins.zip
           Compress-Archive -Path output\PDB\ PDB.zip
 
       - name: Upload PLUGIN
         uses: actions/upload-artifact@v2
         with:
-          name: ${{env.PLUGIN_NAME}}-actions-${{ github.run_number }}
+          name: plugins
           path: ${{ github.workspace }}\output\${{env.PLUGIN_NAME}}
 
       - name: Upload PDB
         uses: actions/upload-artifact@v2
         with:
-          name: PDB-actions-${{ github.run_number }}
+          name: PDB
           path: ${{ github.workspace }}\output\PDB
 
