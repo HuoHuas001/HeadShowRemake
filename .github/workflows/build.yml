@@ -37,7 +37,7 @@ jobs:
         run: |
           echo ${{vars.bdsVersion}}
           mkdir -p ${{ env.SDK_DIR }}/Tools/Server
-          ServerLink=${{steps.bds.BDS_URL}}
+          ServerLink=${{steps.bds.outputs.BDS_URL}}
           curl -L -o ${{ env.SDK_DIR }}/Tools/Server/server.zip "$ServerLink"
           unzip ${{ env.SDK_DIR }}/Tools/Server/server.zip -d ${{ env.SDK_DIR }}/Tools/Server/ > /dev/null
         shell: bash
@@ -125,7 +125,7 @@ jobs:
           method: 'POST'
           customHeaders: '{"Authorization": "Bearer ${{ secrets.MBKey }}"}'
           contentType: 'application/json'
-          data: '{"title": "Update For ${{ steps.bds.BDS_VERSION }}", "description": "RT", "new_version": "${{ steps.time.outputs.time }}", "file_url": "https://github.com/HuoHuas001/HeadShowRemake/releases/latest"}'
+          data: '{"title": "Update For ${{ steps.bds.outputs.BDS_VERSION }}", "description": "RT", "new_version": "${{ steps.time.outputs.time }}", "file_url": "https://github.com/HuoHuas001/HeadShowRemake/releases/latest"}'
           escapeData: 'true'
           preventFailureOnNoResponse: 'true'
           ignoreStatusCodes: '400,404,401,403,500,502,503,504'
