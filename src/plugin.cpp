@@ -20,8 +20,8 @@ extern Logger logger;
 
 // PlayerMap
 playerMap<string> ORIG_NAME;
-dynamicSymbolsMap_type dynamicSymbolsMap;
 std::function<std::string(std::string const& a1, std::string const& a2)> PAPIgetValueByPlayerAPI;
+std::function<long long(std::string const& xuid)> LLMoneyGet;
 
 // Config
 string defaultString = "%player_realname%\n§c❤§b%player_max_health%§e/§a%player_health% §b%player_max_hunger%§e/§a%player_hunger%\n§f%player_device% §c%player_ping%ms";
@@ -71,7 +71,7 @@ void updateHead()
         }
 
         // get Player's LLMoney
-        if (dynamicSymbolsMap.LLMoneyGet)
+        if (LLMoneyGet)
         {
             string money = std::to_string(LLMoneyGet(pl->getXuid()));
             ud["%money%"] = money;
@@ -79,7 +79,6 @@ void updateHead()
 
         // 格式化接入PAPI
         string sinfo = PAPIgetValueByPlayerAPI(_defaultString, pl->getXuid());
-        logger.info(sinfo);
         sinfo = forEachReplace(ud, sinfo);
 
         // 设置NameTag
@@ -135,5 +134,9 @@ void PluginInit()
 		}
         // BePlaceHolder Call Function
         PAPIgetValueByPlayerAPI = RemoteCall::importAs<std::string(std::string const& str, std::string const& xuid)>("BEPlaceholderAPI", "translateString");
-		return true; });
+
+        if(ll::getPlugin("LLMoney"))
+            LLMoneyGet = RemoteCall::importAs<long long(std::string const& xuid)>("LLMoney", "LLMoneyGet");
+
+        return true; });
 }
