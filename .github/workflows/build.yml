@@ -28,22 +28,16 @@ jobs:
         with:
           submodules: true
 
-      - name: Catch BDS Version
-        working-directory: ${{env.GITHUB_WORKSPACE}}
-        run: |
-          curl -L -o ${{ env.SDK_DIR }}/Tools/LINK.txt "https://raw.githubusercontent.com/LiteLDev/LiteLoaderBDS/develop/scripts/LINK.txt"
-          fileUrl=$(cat '${{ env.SDK_DIR }}/Tools/LINK.txt')
-          fileVersion=${fileUrl##*-}
-          bdsVersion=${fileVersion%.*}
-        shell: bash
-
+      - name: catch bds version
+        uses: HuoHuas001/Auto-Catch-BDS-Version@v1
+        id: bds
 
       - name: Download BDS
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
           echo ${{vars.bdsVersion}}
           mkdir -p ${{ env.SDK_DIR }}/Tools/Server
-          ServerLink=$(cat '${{ env.SDK_DIR }}/Tools/LINK.txt')
+          ServerLink=${{steps.bds.BDS_URL}}
           curl -L -o ${{ env.SDK_DIR }}/Tools/Server/server.zip "$ServerLink"
           unzip ${{ env.SDK_DIR }}/Tools/Server/server.zip -d ${{ env.SDK_DIR }}/Tools/Server/ > /dev/null
         shell: bash
@@ -131,7 +125,7 @@ jobs:
           method: 'POST'
           customHeaders: '{"Authorization": "Bearer ${{ secrets.MBKey }}"}'
           contentType: 'application/json'
-          data: '{"title": "Update For ${{ env.BDS_VERSION }}", "description": "RT", "new_version": "${{ steps.time.outputs.time }}", "file_url": "https://github.com/HuoHuas001/HeadShowRemake/releases/latest"}'
+          data: '{"title": "Update For ${{ steps.bds.BDS_VERSION }}", "description": "RT", "new_version": "${{ steps.time.outputs.time }}", "file_url": "https://github.com/HuoHuas001/HeadShowRemake/releases/latest"}'
           escapeData: 'true'
           preventFailureOnNoResponse: 'true'
           ignoreStatusCodes: '400,404,401,403,500,502,503,504'
