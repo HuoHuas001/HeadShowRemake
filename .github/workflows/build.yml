@@ -130,3 +130,13 @@ jobs:
           preventFailureOnNoResponse: 'true'
           ignoreStatusCodes: '400,404,401,403,500,502,503,504'
 
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body: 'RT'
+          files: |
+            ${{ env.GITHUB_WORKSPACE }}\output\${{ env.PLUGIN_NAME }}\plugins.zip
+        env:
+            GITHUB_REPOSITORY: ${{env.RepoName}}
+
