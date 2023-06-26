@@ -52,37 +52,41 @@ void updateHead()
 {
     for (auto pl : Level::getAllPlayers())
     {
-        // Init Var
-        std::unordered_map<string, string> ud = {};
-        string _defaultString = defaultString;
+        try{
+            // Init Var
+            std::unordered_map<string, string> ud = {};
+            string _defaultString = defaultString;
 
-        // Save Player's realName
-        string playerRealName = pl->getRealName();
-        ORIG_NAME[(ServerPlayer *)pl] = playerRealName;
+            // Save Player's realName
+            string playerRealName = pl->getRealName();
+            ORIG_NAME[(ServerPlayer *)pl] = playerRealName;
 
-        // get Player's Scoreboard Score
-        if (defaultScoreBoard.size() != 0)
-        {
-            for (auto it = defaultScoreBoard.begin(); it != defaultScoreBoard.end(); ++it)
+            // get Player's Scoreboard Score
+            if (defaultScoreBoard.size() != 0)
             {
-                string score = std::to_string(pl->getScore((string)it.value()));
-                ud["%" + it.key() + "%"] = score;
+                for (auto it = defaultScoreBoard.begin(); it != defaultScoreBoard.end(); ++it)
+                {
+                    string score = std::to_string(pl->getScore((string)it.value()));
+                    ud["%" + it.key() + "%"] = score;
+                }
             }
+
+            // get Player's LLMoney
+            if (LLMoneyGet)
+            {
+                string money = std::to_string(LLMoneyGet(pl->getXuid()));
+                ud["%money%"] = money;
+            }
+
+            // 格式化接入PAPI
+            string sinfo = PAPIgetValueByPlayerAPI(_defaultString, pl->getXuid());
+            sinfo = forEachReplace(ud, sinfo);
+
+            // 设置NameTag
+            pl->rename(sinfo);
         }
-
-        // get Player's LLMoney
-        if (LLMoneyGet)
-        {
-            string money = std::to_string(LLMoneyGet(pl->getXuid()));
-            ud["%money%"] = money;
-        }
-
-        // 格式化接入PAPI
-        string sinfo = PAPIgetValueByPlayerAPI(_defaultString, pl->getXuid());
-        sinfo = forEachReplace(ud, sinfo);
-
-        // 设置NameTag
-        pl->rename(sinfo);
+        catch(...){}
+        
     }
     return;
 }
